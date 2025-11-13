@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Orders - Aiza Tasty</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+    <style>
+        table { width: 100%; border-collapse: separate; border-spacing: 0 0.7em; }
+        th, td { padding: 0.7em 1em; text-align: left; background: #fff8dc; border-radius: 6px; }
+        th { background: darkgoldenrod; color: #fff; }
+    </style>
+</head>
+<body class="auth-bg">
+<div class="auth-container">
+    <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo">
+    <h2>Orders</h2>
+    <table>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Total</th><th>Date</th></tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.name }}</td>
+            <td>{{ order.email }}</td>
+            <td>${{ order.total_price }}</td>
+            <td>{{ order.created_at }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No orders yet.</td></tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+</body>
+</html>

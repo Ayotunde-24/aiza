@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product - Aiza Admin</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+    <style>
+        .edit-form {
+            max-width: 500px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .edit-form h2 {
+            color: darkgoldenrod;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .edit-form button {
+            background-color: black;
+            color: darkgoldenrod;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .edit-form button:hover {
+            background-color: #222;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{% url 'admin_dashboard' %}">⬅ Back to Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <div class="edit-form">
+        <h2>Edit Product: {{ product.name }}</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

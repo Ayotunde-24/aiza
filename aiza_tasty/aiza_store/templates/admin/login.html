@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block title %}Admin Login | Aiza Tasty{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo">
+    <h2 style="color:darkgoldenrod;">Admin Login</h2>
+    {% if form.errors %}
+        <p style="color:crimson;">Please enter the correct username and password.</p>
+    {% endif %}
+    <form method="post" id="login-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Login</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics - Aiza Tasty</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body class="auth-bg">
+<div class="auth-container">
+    <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo">
+    <h2>Analytics</h2>
+    <p><strong>Total Sales:</strong> ${{ total_sales }}</p>
+    <p><strong>Total Orders:</strong> {{ total_orders }}</p>
+    <h3>Top Products</h3>
+    <ul>
+        {% for product in top_products %}
+        <li>{{ product.name }} ({{ product.order_count }} orders)</li>
+        {% empty %}
+        <li>No top products yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+</body>
+</html>

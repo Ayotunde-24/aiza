@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Wishlist - Aiza Tasty</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body>
+
+
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'wishlist' %}">❤️ Wishlist ({{ wishlist_count }})</a></li>
+        <li><a href="{% url 'cart_view' %}">🛒 Cart (<span class="cart-count">{{ cart_count }}</span>)</a></li>
+        {% if user.is_authenticated %}
+            <li><a href="#">👤 {{ user.username }}</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">Logout</button>
+                </form>
+            </li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Register</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<header class="top-header">
+    <h1>My Wishlist</h1>
+</header>
+
+<main>
+    <div class="cake-gallery">
+        {% for product in products %}
+            <div class="cake-card" data-id="{{ product.id }}">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                <h4>{{ product.name }}</h4>
+                <p>${{ product.price }}</p>
+
+                <button class="add-to-cart" data-url="{% url 'add_to_cart' product.id %}">🛒 Add to Cart</button>
+                <button class="wishlist-btn active" data-url="{% url 'add_to_wishlist' product.id %}" title="Remove from Wishlist">&#10084;</button>
+            </div>
+        {% empty %}
+            <p>Your wishlist is empty.</p>
+        {% endfor %}
+    </div>
+</main>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Aiza Tasty Cakes & Pastries</h3>
+            <p>Celebrating every moment with custom-designed masterpieces. Freshly baked and made with love.</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'cart_view' %}">Cart</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-icons">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 Aiza Tasty Cakes & Pastries | All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/18bf425401.js" crossorigin="anonymous"></script>
+
+
+<script>
+    // AJAX Wishlist Toggle
+    document.querySelectorAll(".wishlist-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            fetch(this.dataset.url, {
+                method: "GET",
+                headers: {"X-Requested-With": "XMLHttpRequest"}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.toggle("active");
+                    // Toggle heart color and tooltip only
+                    if (data.status === "removed") {
+                        this.title = "Add to Wishlist";
+                        this.classList.remove("active");
+                    } else {
+                        this.title = "Remove from Wishlist";
+                        this.classList.add("active");
+                    }
+                    // Update wishlist count in the side list (icon-links) and nav-links
+                    document.querySelectorAll(".icon-links a[href$='wishlist/'], .nav-links a[href$='wishlist/']").forEach(el => {
+                        el.innerHTML = `&#10084; Wishlist (${data.wishlist_count})`;
+                    });
+                    // Optionally remove the card from DOM if removed
+                    if (data.status === "removed") {
+                        this.closest('.cake-card').remove();
+                    }
+                }
+            });
+        });
+    });
+
+    // AJAX Cart (already in your project)
+</script>
+
+</body>
+</html>

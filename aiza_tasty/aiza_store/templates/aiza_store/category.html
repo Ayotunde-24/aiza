@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ category.name }} - Aiza Tasty Cakes & Pastries</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+    <script src="https://kit.fontawesome.com/18bf425401.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'cart_view' %}">Cart (<span class="cart-count">{{ cart_count }}</span>)</a></li>
+        </ul>
+    </nav>
+
+    <!-- 🔹 Header (Logo + Search + Icons in one row) -->
+    <div class="top-header">
+        <div class="header-content">
+            <!-- Logo -->
+            <div class="header-container">
+                <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo" class="logo">
+            </div>
+
+            <!-- Search -->
+            <form method="GET" action="{% url 'home' %}" class="search">
+                <input type="text" name="q" placeholder="Search for products">
+                <button type="submit">🔍</button>
+            </form>
+
+            <!-- Icons -->
+            <div class="icon-links">
+                <a href="{% url 'wishlist' %}">♡ Wishlist</a>
+                <a href="{% url 'cart_view' %}">🛒 Cart (<span class="cart-count">{{ cart_count }}</span>)</a>
+                {% if user.is_authenticated %}
+                    <a href="#">👤 {{ user.username }}</a>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'signup' %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Category Navigation -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="{% url 'home' %}">Browse All Categories</a></li>
+            {% for cat in categories %}
+                <li><a href="{% url 'category_products' cat.id %}">{{ cat.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <!-- Products -->
+    <section class="product-section">
+        <div class="section-title">
+            <hr>
+            <h2>{{ category.name }}</h2>
+            <hr>
+        </div>
+
+        <div class="cake-gallery">
+            {% for product in page_obj %}
+                <div class="cake-card">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    <h4>{{ product.name }}</h4>
+                    <p>${{ product.price }}</p>
+                    <button class="add-to-cart" data-url="{% url 'add_to_cart' product.id %}">
+                        Add to Cart
+                    </button>
+                    <button class="wishlist-btn" data-url="{% url 'add_to_wishlist' product.id %}" title="Add to Wishlist">&#10084;</button>
+                </div>
+            {% empty %}
+                <p>No products in this category.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+    </section>
+    
+    <!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Aiza Tasty Cakes & Pastries</h3>
+            <p>Celebrating every moment with custom-designed masterpieces. Freshly baked and made with love.</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'cart_view' %}">Cart</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-icons">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 Aiza Tasty Cakes & Pastries | All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/18bf425401.js" crossorigin="anonymous"></script>
+
+
+    <!-- Cart JS -->
+    <script>
+    document.querySelectorAll(".add-to-cart").forEach(button => {
+        button.addEventListener("click", function() {
+            fetch(this.dataset.url, {
+                method: "GET",
+                headers: {"X-Requested-With": "XMLHttpRequest"}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll(".cart-count").forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+            });
+        });
+    });
+    </script>
+    <script>
+            document.querySelectorAll(".wishlist-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                fetch(this.dataset.url, {
+                            method: "GET",
+                            headers: {"X-Requested-With": "XMLHttpRequest"}
+                     })
+                    .then(res => res.json())
+                   .then(data => {
+                      if (data.success) {
+                          // Optionally toggle active state or update UI here
+                          this.classList.toggle("active");
+                      }
+                    });
+                });
+            });
+    </script>
+
+</body>
+</html>

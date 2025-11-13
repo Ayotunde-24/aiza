@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - Aiza Tasty</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'cart_view' %}">Cart ({{ cart|length }})</a></li>
+        </ul>
+    </nav>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <h2>Checkout</h2>
+
+        {% if products %}
+            <h3>Order Summary</h3>
+            <ul class="checkout-summary">
+                {% for product in products %}
+                    <li>
+                        {{ product.name }} ×{{ product.quantity }} 
+                        — ${{ product.price|floatformat:2 }}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" name="phone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Delivery Address</label>
+                    <textarea name="address" rows="3" required></textarea>
+                </div>
+
+                <button type="submit" class="place-order-btn">Place Order</button>
+            </form>
+        {% else %}
+            <p>Your cart is empty 🛒</p>
+        {% endif %}
+    </section>
+
+    <!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Aiza Tasty Cakes & Pastries</h3>
+            <p>Celebrating every moment with custom-designed masterpieces. Freshly baked and made with love.</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'cart_view' %}">Cart</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-icons">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 Aiza Tasty Cakes & Pastries | All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/18bf425401.js" crossorigin="anonymous"></script>
+
+
+</body>
+</html>

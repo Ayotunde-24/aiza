@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Gallery - Aiza Tasty</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body class="auth-bg">
+<div class="auth-container">
+    <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo">
+    <h2>Product Images</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:1em;justify-content:center;">
+        {% for product in products %}
+        <div style="background:#fff8dc;padding:1em;border-radius:8px;box-shadow:0 2px 8px #0001;">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">
+            <div>{{ product.name }}</div>
+        </div>
+        {% empty %}
+        <div>No images found.</div>
+        {% endfor %}
+    </div>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+</body>
+</html>

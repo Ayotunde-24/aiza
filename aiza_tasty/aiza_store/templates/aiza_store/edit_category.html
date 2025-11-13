@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Category - Aiza Dashboard</title>
+  <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body>
+  <div style="padding: 2rem;">
+    <h1>Edit Category: {{ category.name }}</h1>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" style="background:black; color:darkgoldenrod; padding:10px 20px; border:none;">Save Changes</button>
+    </form>
+    <p><a href="{% url 'admin_dashboard' %}">⬅ Back to Dashboard</a></p>
+  </div>
+</body>
+</html>

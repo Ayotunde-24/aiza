@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aiza Admin Dashboard</title>
+  <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+  <style>
+    body { background: #f5f5f5; color: #222; font-family: Poppins, sans-serif; }
+    .dashboard-container { padding: 2rem; }
+    .tabs { display: flex; gap: 1rem; border-bottom: 2px solid darkgoldenrod; margin-bottom: 1rem; }
+    .tab-btn { background: black; color: darkgoldenrod; border: none; padding: 0.7rem 1.2rem; cursor: pointer; font-weight: bold; border-radius: 5px 5px 0 0; }
+    .tab-btn.active { background: darkgoldenrod; color: black; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .form-box, .table-box {
+      background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    table, th, td { border: 1px solid #ddd; }
+    th, td { padding: 10px; text-align: center; }
+    th { background: black; color: darkgoldenrod; }
+    .btn-delete { background: #c0392b; color: white; padding: 5px 8px; border-radius: 4px; text-decoration: none; }
+
+    /* Admin Navigation */
+    .admin-nav {
+      background: darkgoldenrod;
+      padding: 1em 0;
+      text-align: center;
+      margin-bottom: 2em;
+      border-radius: 8px;
+    }
+    .admin-nav a {
+      color: #fff;
+      font-weight: 700;
+      margin: 0 1em;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Navigation -->
+  <nav class="admin-nav">
+      <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'manage_orders' %}">Orders</a>
+      <a href="{% url 'manage_users' %}">Users</a>
+      <a href="{% url 'dashboard_analytics' %}">Analytics</a>
+      <a href="{% url 'image_gallery' %}">Images</a>
+      <a href="{% url 'export_products_csv' %}">Export CSV</a>
+  </nav>
+
+  <div class="dashboard-container">
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="products">Products</button>
+      <button class="tab-btn" data-tab="categories">Categories</button>
+      <button class="tab-btn" data-tab="orders">Orders</button>
+      <button class="tab-btn" data-tab="settings">Settings</button>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div id="products" class="tab-content active">
+      <div class="form-box">
+        <h2>Add Product</h2>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ product_form.as_p }}
+          <button type="submit" name="add_product" class="tab-btn">Add Product</button>
+        </form>
+      </div>
+
+      <div class="table-box">
+        <h2>All Products</h2>
+        <table>
+          <tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Action</th></tr>
+          {% for p in products %}
+          <tr>
+            <td><img src="{{ p.image.url }}" alt="{{ p.name }}" width="80"></td>
+            <td>{{ p.name }}</td>
+            <td>${{ p.price }}</td>
+            <td>{{ p.category.name }}</td>
+            <td>
+               <a href="{% url 'edit_product' p.id %}" class="btn-edit">Edit</a> |
+                <a href="?delete_product={{ p.id }}" class="btn-delete">Delete</a>              
+           </td>
+
+          </tr>
+          {% empty %}
+          <tr><td colspan="5">No products found.</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+
+    <!-- CATEGORIES TAB -->
+    <div id="categories" class="tab-content">
+      <div class="form-box">
+        <h2>Add Category</h2>
+        <form method="POST">
+          {% csrf_token %}
+          {{ category_form.as_p }}
+          <button type="submit" name="add_category" class="tab-btn">Add Category</button>
+        </form>
+      </div>
+
+      <div class="table-box">
+        <h2>All Categories</h2>
+        <table>
+          <tr><th>Name</th><th>Action</th></tr>
+          {% for c in categories %}
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>
+              <a href="{% url 'edit_category' c.id %}" class="btn-edit">Edit</a> |
+              <a href="?delete_category={{ c.id }}" class="btn-delete">Delete</a>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr><td colspan="2">No categories found.</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="orders" class="tab-content">
+      <div class="table-box">
+        <h2>All Orders</h2>
+        <table>
+          <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Total</th><th>Date</th></tr>
+          {% for o in orders %}
+          <tr>
+            <td>{{ o.id }}</td>
+            <td>{{ o.name }}</td>
+            <td>{{ o.email }}</td>
+            <td>{{ o.phone }}</td>
+            <td>${{ o.total_price }}</td>
+            <td>{{ o.created_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6">No orders found.</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div id="settings" class="tab-content">
+      <div class="form-box">
+        <h2>Site Settings (Coming Soon)</h2>
+        <p>Here you’ll be able to update homepage banners, contact info, and theme colors.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

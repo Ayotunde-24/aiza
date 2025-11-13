@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product - Aiza Tasty</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+    <style>
+        body { background: #fff8dc; font-family: 'Segoe UI', Arial, sans-serif; }
+        .auth-container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px #0002; padding: 2em 2.5em; text-align: center; }
+        .auth-container img { width: 80px; margin-bottom: 1em; }
+        .auth-container h2 { color: darkgoldenrod; font-size: 2em; margin-bottom: 0.5em; }
+        .auth-container form { margin-bottom: 1em; }
+        .auth-container .btn { background: darkgoldenrod; color: #fff; font-weight: 700; border: none; border-radius: 6px; padding: 0.7em 2em; font-size: 1em; box-shadow: 0 2px 8px #0001; cursor: pointer; margin-top: 0.5em; transition: background 0.2s; }
+        .auth-container .btn:hover { background: #fff8dc; color: darkgoldenrod; }
+        .auth-container a { color: darkgoldenrod; text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="auth-container">
+    <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo">
+    <h2>Edit Product</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Save Changes</button>
+    </form>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+</body>
+</html>

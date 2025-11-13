@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aiza Tasty Cakes & Pastries</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'cart_view' %}">Cart (<span class="cart-count">{{ cart_count }}</span>)</a></li>
+        </ul>
+    </nav>
+
+    <!-- 🔹 Header  -->
+<div class="top-header">
+    <div class="header-content">
+        <!-- Logo -->
+        <div class="header-container">
+            <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo" class="logo">
+        </div>
+
+        <!-- Search -->
+        <form method="GET" action="{% url 'home' %}" class="search">
+            <input type="text" name="q" placeholder="Search for products">
+            <button type="submit">🔍</button>
+        </form>
+
+        <!-- Icons -->
+        <div class="icon-links">
+            <a href="{% url 'wishlist' %}">♡ Wishlist</a>
+            <a href="{% url 'cart_view' %}">🛒 Cart (<span class="cart-count">{{ cart_count }}</span>)</a>
+            {% if user.is_authenticated %}
+                <a href="#">👤 {{ user.username }}</a>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">Logout</button>
+</form>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'signup' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="{% url 'home' %}">Browse All Categories</a></li>
+            {% for category in categories %}
+                <li><a href="{% url 'category_products' category.id %}">{{ category.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <!-- Banner -->
+    <!-- Rotating Banner -->
+    <section class="quote-banner">
+        <div class="banner-slider">
+            <!-- Cakes Slide -->
+            <div class="banner-slide active">
+                <div class="banner-img-wrap">
+                    <img src="/media/products/Red_Velvet.jpg" alt="Cake 1">
+                </div>
+                <div class="banner-quote-wrap">
+                    <div class="banner-headline">Indulge in Sweet Perfection</div>
+                    <div class="banner-quote">“Every slice is a celebration. Taste the magic in every bite!”</div>
+                    <a href="{% url 'category_products' 1 %}" class="banner-btn">Shop Cakes</a>
+                </div>
+            </div>
+            <!-- Pastries Slide -->
+                <div class="banner-slide">
+                    <div class="banner-img-wrap">
+                        <img src="/media/products/pastry.png" alt="Pastries" style="background:transparent;">
+                    </div>
+                    <div class="banner-quote-wrap">
+                        <div class="banner-headline">Pastries for Every Craving</div>
+                        <div class="banner-quote">“Flaky, buttery, and oh-so-satisfying. Pastries that make your day!”</div>
+                        <a href="{% url 'category_products' 2 %}" class="banner-btn">Shop Pastries</a>
+                    </div>
+                </div>
+            <!-- Parfait Slide -->
+            <div class="banner-slide">
+                <div class="banner-img-wrap">
+                    <img src="{% static 'aiza_store/images/parfait/cake parfait.jpg' %}" alt="Parfait">
+                </div>
+                <div class="banner-quote-wrap">
+                    <div class="banner-headline">Perfect Parfaits</div>
+                    <div class="banner-quote">“Layers of joy in every spoonful. Treat yourself to a parfait!”</div>
+                    <a href="{% url 'category_products' 3 %}" class="banner-btn">Shop Parfaits</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    // Simple auto-rotating banner
+    let bannerIndex = 0;
+    const slides = document.querySelectorAll('.banner-slide');
+    setInterval(() => {
+        slides[bannerIndex].classList.remove('active');
+        bannerIndex = (bannerIndex + 1) % slides.length;
+        slides[bannerIndex].classList.add('active');
+    }, 4000);
+    </script>
+
+<!-- Featured Products -->
+    <section class="featured-products">
+         <h2>Featured Products</h2>
+         <div class="featured-list">
+             {% for product in featured_products %}
+                 <div class="featured-card">
+                     <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                      <h4>{{ product.name }}</h4>
+                      <p>${{ product.price }}</p>
+                      <a href="{% url 'category_products' product.category.id %}" class="btn">Shop Now</a>
+                    </div>
+               {% endfor %}
+           </div>
+  </section>
+
+  
+    <!-- Featured Products per Category -->
+    {% for category, products in category_products.items %}
+        <section class="product-section">
+            <div class="section-title">
+                <hr>
+                <h2>{{ category.name }}</h2>
+                <hr>
+            </div>
+
+            <div class="cake-gallery">
+                {% for product in products %}
+                    <div class="cake-card">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        <h4>{{ product.name }}</h4>
+                        <p>${{ product.price }}</p>
+                        <button class="add-to-cart" data-url="{% url 'add_to_cart' product.id %}">
+                            Add to Cart
+                        </button>
+                     <button class="wishlist-btn" data-url="{% url 'add_to_wishlist' product.id %}" title="Add to Wishlist">&#10084;</button>
+                    </div>    
+                {% empty %}
+                    <p>No products yet in {{ category.name }}.</p>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+  <h2>What Our Customers Say</h2>
+  <div class="testimonial-list">
+    <div class="testimonial-card">
+      <p>“The cakes are always fresh and delicious. My family loves every bite!”</p>
+      <span>- Sarah O.</span>
+    </div>
+    <div class="testimonial-card">
+      <p>“Best pastries in town! The delivery was fast and the service was excellent.”</p>
+      <span>- Michael A.</span>
+    </div>
+    <div class="testimonial-card">
+      <p>“I ordered a parfait for my birthday and it was perfect. Highly recommend!”</p>
+      <span>- Tolu F.</span>
+    </div>
+  </div>
+</section>
+<!-- Call to Action -->
+  <section class="cta-section">
+  <h2>Ready to Treat Yourself?</h2>
+  <p>Order now and enjoy fast delivery of the freshest cakes, pastries, and parfaits in town!</p>
+  <a href="{% url 'category_products' 1 %}" class="cta-btn">Order Now</a>
+</section>
+
+    <!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Aiza Tasty Cakes & Pastries</h3>
+            <p>Celebrating every moment with custom-designed masterpieces. Freshly baked and made with love.</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'cart_view' %}">Cart</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-icons">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 Aiza Tasty Cakes & Pastries | All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/18bf425401.js" crossorigin="anonymous"></script>
+
+
+    <!-- JS for Add to Cart -->
+    <script>
+    document.querySelectorAll(".add-to-cart").forEach(button => {
+        button.addEventListener("click", function() {
+            fetch(this.dataset.url, {
+                method: "GET",
+                headers: {"X-Requested-With": "XMLHttpRequest"}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll(".cart-count").forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll(".wishlist-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            fetch(this.dataset.url, {
+                method: "GET",
+                headers: {"X-Requested-With": "XMLHttpRequest"}
+            })
+           .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update wishlist count in the side list (icon-links)
+                    document.querySelectorAll(".icon-links a[href$='wishlist/']").forEach(el => {
+                        el.innerHTML = `&#10084; Wishlist (${data.wishlist_count})`;
+                    });
+                    // Optionally toggle active state
+                    this.classList.toggle("active");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
