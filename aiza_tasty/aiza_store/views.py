@@ -8,25 +8,44 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django import forms
 from django.contrib.auth.models import User
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 import csv
 from django.http import HttpResponse
 
 # ---------- HOME ----------
-def home(request):
-    categories = Category.objects.all()
-    category_products = {}
+from django.db.models import Q
 
+def home(request):
+    query = request.GET.get('q')  # Get search term from the form
+    categories = Category.objects.all()
+
+    # 🔍 If user is searching
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) | Q(category__name__icontains=query)
+        )
+        context = {
+            'query': query,
+            'search_results': products,
+            'categories': categories,
+        }
+        return render(request, 'aiza_store/search_results.html', context)
+
+    # 🏠 Default homepage display
+    category_products = {}
     for category in categories:
-        # only take first 3 products per category
+        # Only take first 3 products per category
         category_products[category] = Product.objects.filter(category=category)[:3]
-        featured_products = Product.objects.order_by('-id')[:4]
+
+    # 🧁 Featured products (latest 4)
+    featured_products = Product.objects.order_by('-id')[:4]
 
     return render(request, "aiza_store/home.html", {
         "categories": categories,
         "category_products": category_products,
         "featured_products": featured_products,
     })
+
 
 # ---------- SIGNUP ----------
 def signup(request):

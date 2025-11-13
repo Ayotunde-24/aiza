@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results - Aiza Tasty Pastries</title>
+    <link rel="stylesheet" href="{% static 'aiza_store/styles.css' %}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'cart_view' %}">Cart (<span class="cart-count">{{ cart_count }}</span>)</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <header class="top-header">
+        <div class="header-content">
+            <div class="header-container">
+                <img src="{% static 'aiza_store/logo.png' %}" alt="Aiza Logo" class="logo">
+            </div>
+            <form method="GET" action="{% url 'home' %}" class="search">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search for products">
+                <button type="submit">🔍</button>
+            </form>
+            <div class="icon-links">
+                <a href="#">♡ Wishlist</a>
+                    <a href="{% url 'cart_view' %}">🛒 Cart (<span class="cart-count">{{ cart_count }}</span>)</a>
+                <a href="#">👤 Account</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main>
+        <div class="container">
+            <section class="products">
+                <div class="section-title">
+                    <hr>
+                    <h2>Search Results for "{{ query }}"</h2>
+                    <hr>
+                </div>
+
+                {% if search_results %}
+                    <div class="cake-gallery">
+                        {% for product in search_results %}
+                        <div class="cake-card">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            <h4>{{ product.name }}</h4>
+                            <p>${{ product.price }}</p>
+                            <button class="add-to-cart" data-url="{% url 'add_to_cart' product.id %}">
+                                Add to Cart
+                            </button>
+                            <button class="wishlist-btn" data-url="{% url 'add_to_wishlist' product.id %}" title="Add to Wishlist">&#10084;</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="text-align:center; color:darkgoldenrod;">No products found matching "{{ query }}".</p>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+   <!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Aiza Tasty Cakes & Pastries</h3>
+            <p>Celebrating every moment with custom-designed masterpieces. Freshly baked and made with love.</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'cart_view' %}">Cart</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-icons">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 Aiza Tasty Cakes & Pastries | All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/18bf425401.js" crossorigin="anonymous"></script>
+
+    <!-- JS for Add to Cart -->
+    <script>
+    document.querySelectorAll(".add-to-cart").forEach(button => {
+        button.addEventListener("click", function() {
+            fetch(this.dataset.url, {
+                method: "GET",
+                headers: {"X-Requested-With": "XMLHttpRequest"}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll(".cart-count").forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+            });
+        });
+    });
+    </script>
+
+</body>
+</html>
